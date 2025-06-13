@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { X, Search, Filter } from 'lucide-react';
+import React from 'react';
+import { X, Filter } from 'lucide-react';
 import { SearchFilters as SearchFiltersType, NEPAL_LOCATIONS, KATHMANDU_AREAS, ROOM_AMENITIES } from '../../types/room';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -23,30 +23,21 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   onClose,
   isModal = false
 }) => {
-  const [localFilters, setLocalFilters] = useState<SearchFiltersType>(filters);
-
-  const handleApplyFilters = () => {
-    onFiltersChange(localFilters);
-    if (isModal && onClose) {
-      onClose();
-    }
+  const updateFilter = (key: keyof SearchFiltersType, value: any) => {
+    const newFilters = {
+      ...filters,
+      [key]: value
+    };
+    onFiltersChange(newFilters);
   };
 
   const handleClearFilters = () => {
     const clearedFilters: SearchFiltersType = {};
-    setLocalFilters(clearedFilters);
     onFiltersChange(clearedFilters);
   };
 
-  const updateFilter = (key: keyof SearchFiltersType, value: any) => {
-    setLocalFilters(prev => ({
-      ...prev,
-      [key]: value
-    }));
-  };
-
   const handleAmenityChange = (amenity: string, checked: boolean) => {
-    const currentAmenities = localFilters.amenities || [];
+    const currentAmenities = filters.amenities || [];
     if (checked) {
       updateFilter('amenities', [...currentAmenities, amenity]);
     } else {
@@ -55,7 +46,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
   };
 
   const handleRoomTypeChange = (roomType: string, checked: boolean) => {
-    const currentTypes = localFilters.roomType || [];
+    const currentTypes = filters.roomType || [];
     if (checked) {
       updateFilter('roomType', [...currentTypes, roomType]);
     } else {
@@ -68,7 +59,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       {/* Location */}
       <div className="space-y-3">
         <Label className="text-base font-semibold">Location</Label>
-        <Select value={localFilters.location || 'all-locations'} onValueChange={(value) => updateFilter('location', value === 'all-locations' ? undefined : value)}>
+        <Select value={filters.location || 'all-locations'} onValueChange={(value) => updateFilter('location', value === 'all-locations' ? undefined : value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select city or area" />
           </SelectTrigger>
@@ -96,7 +87,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
               id="minPrice"
               type="number"
               placeholder="0"
-              value={localFilters.minPrice || ''}
+              value={filters.minPrice || ''}
               onChange={(e) => updateFilter('minPrice', e.target.value ? Number(e.target.value) : undefined)}
             />
           </div>
@@ -106,7 +97,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
               id="maxPrice"
               type="number"
               placeholder="No limit"
-              value={localFilters.maxPrice || ''}
+              value={filters.maxPrice || ''}
               onChange={(e) => updateFilter('maxPrice', e.target.value ? Number(e.target.value) : undefined)}
             />
           </div>
@@ -121,7 +112,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             <div key={type} className="flex items-center space-x-2">
               <Checkbox
                 id={type}
-                checked={localFilters.roomType?.includes(type) || false}
+                checked={filters.roomType?.includes(type) || false}
                 onCheckedChange={(checked) => handleRoomTypeChange(type, checked as boolean)}
               />
               <Label htmlFor={type} className="text-sm capitalize">{type}</Label>
@@ -138,7 +129,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             <div key={amenity} className="flex items-center space-x-2">
               <Checkbox
                 id={amenity}
-                checked={localFilters.amenities?.includes(amenity) || false}
+                checked={filters.amenities?.includes(amenity) || false}
                 onCheckedChange={(checked) => handleAmenityChange(amenity, checked as boolean)}
               />
               <Label htmlFor={amenity} className="text-sm">{amenity}</Label>
@@ -154,7 +145,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           <div className="flex items-center space-x-2">
             <Checkbox
               id="furnished"
-              checked={localFilters.furnished || false}
+              checked={filters.furnished || false}
               onCheckedChange={(checked) => updateFilter('furnished', checked)}
             />
             <Label htmlFor="furnished" className="text-sm">Furnished</Label>
@@ -162,7 +153,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           <div className="flex items-center space-x-2">
             <Checkbox
               id="parking"
-              checked={localFilters.parking || false}
+              checked={filters.parking || false}
               onCheckedChange={(checked) => updateFilter('parking', checked)}
             />
             <Label htmlFor="parking" className="text-sm">Parking Available</Label>
@@ -170,7 +161,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           <div className="flex items-center space-x-2">
             <Checkbox
               id="wifi"
-              checked={localFilters.wifi || false}
+              checked={filters.wifi || false}
               onCheckedChange={(checked) => updateFilter('wifi', checked)}
             />
             <Label htmlFor="wifi" className="text-sm">WiFi Included</Label>
@@ -178,7 +169,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
           <div className="flex items-center space-x-2">
             <Checkbox
               id="kitchen"
-              checked={localFilters.kitchen || false}
+              checked={filters.kitchen || false}
               onCheckedChange={(checked) => updateFilter('kitchen', checked)}
             />
             <Label htmlFor="kitchen" className="text-sm">Kitchen Access</Label>
@@ -189,7 +180,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       {/* Washroom Type */}
       <div className="space-y-3">
         <Label className="text-base font-semibold">Washroom</Label>
-        <Select value={localFilters.washroom || 'any-washroom'} onValueChange={(value) => updateFilter('washroom', value === 'any-washroom' ? undefined : value)}>
+        <Select value={filters.washroom || 'any-washroom'} onValueChange={(value) => updateFilter('washroom', value === 'any-washroom' ? undefined : value)}>
           <SelectTrigger>
             <SelectValue placeholder="Any type" />
           </SelectTrigger>
@@ -205,7 +196,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       {/* Gender Preference */}
       <div className="space-y-3">
         <Label className="text-base font-semibold">Gender Preference</Label>
-        <Select value={localFilters.gender || 'any-gender'} onValueChange={(value) => updateFilter('gender', value === 'any-gender' ? undefined : value)}>
+        <Select value={filters.gender || 'any-gender'} onValueChange={(value) => updateFilter('gender', value === 'any-gender' ? undefined : value)}>
           <SelectTrigger>
             <SelectValue placeholder="Any gender" />
           </SelectTrigger>
@@ -227,7 +218,7 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
             <Input
               id="availableFrom"
               type="date"
-              value={localFilters.availableFrom || ''}
+              value={filters.availableFrom || ''}
               onChange={(e) => updateFilter('availableFrom', e.target.value)}
             />
           </div>
@@ -237,21 +228,17 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
               id="minStay"
               type="number"
               placeholder="Any"
-              value={localFilters.minStay || ''}
+              value={filters.minStay || ''}
               onChange={(e) => updateFilter('minStay', e.target.value ? Number(e.target.value) : undefined)}
             />
           </div>
         </div>
       </div>
 
-      {/* Action Buttons */}
-      <div className="flex space-x-3 pt-4">
-        <Button onClick={handleClearFilters} variant="outline" className="flex-1">
-          Clear All
-        </Button>
-        <Button onClick={handleApplyFilters} className="flex-1 bg-rose-500 hover:bg-rose-600">
-          <Search className="w-4 h-4 mr-2" />
-          Apply Filters
+      {/* Clear Filters Button */}
+      <div className="pt-4">
+        <Button onClick={handleClearFilters} variant="outline" className="w-full">
+          Clear All Filters
         </Button>
       </div>
     </div>

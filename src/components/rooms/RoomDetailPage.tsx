@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ArrowLeft, MapPin, User, Wifi, Car, Share, Heart, Phone, MessageCircle, Calendar, Home, Shield, Star } from 'lucide-react';
+import { ArrowLeft, MapPin, User, Wifi, Car, Share, Heart, Phone, MessageCircle, Calendar, Home, Shield, Star, CheckCircle, XCircle, Clock, Users } from 'lucide-react';
 import { Room } from '../../types/room';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -17,7 +17,14 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const getRoomTypeLabel = (type: string) => {
-    return type.charAt(0).toUpperCase() + type.slice(1) + ' Room';
+    const typeLabels = {
+      single: 'Single Room',
+      double: 'Double Room', 
+      shared: 'Shared Room',
+      studio: 'Studio Apartment',
+      apartment: 'Full Apartment'
+    };
+    return typeLabels[type as keyof typeof typeLabels] || type;
   };
 
   const getStatusColor = (status: string) => {
@@ -27,6 +34,14 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
       case 'rejected': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   return (
@@ -113,7 +128,7 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
                     </Badge>
                   </div>
 
-                  <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-4 flex-wrap gap-2">
                     <Badge variant="secondary" className="text-sm">
                       {getRoomTypeLabel(room.roomType)}
                     </Badge>
@@ -125,9 +140,41 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
                       <Star className="h-4 w-4" />
                       <span className="ml-2 text-sm text-muted-foreground">4.2 (23 reviews)</span>
                     </div>
+                    <Badge variant={room.availability.available ? "default" : "secondary"} className="flex items-center">
+                      {room.availability.available ? (
+                        <CheckCircle className="h-3 w-3 mr-1" />
+                      ) : (
+                        <XCircle className="h-3 w-3 mr-1" />
+                      )}
+                      {room.availability.available ? 'Available' : 'Not Available'}
+                    </Badge>
                   </div>
 
                   <p className="text-muted-foreground leading-relaxed">{room.description}</p>
+                  
+                  {/* Property Details */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-4">
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <Clock className="h-5 w-5 mx-auto mb-1 text-rose-500" />
+                      <p className="text-sm font-medium">Available From</p>
+                      <p className="text-xs text-muted-foreground">{formatDate(room.availability.availableFrom)}</p>
+                    </div>
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <Calendar className="h-5 w-5 mx-auto mb-1 text-rose-500" />
+                      <p className="text-sm font-medium">Min Stay</p>
+                      <p className="text-xs text-muted-foreground">{room.availability.minStay} months</p>
+                    </div>
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <Users className="h-5 w-5 mx-auto mb-1 text-rose-500" />
+                      <p className="text-sm font-medium">Gender Pref.</p>
+                      <p className="text-xs text-muted-foreground capitalize">{room.preferences.gender}</p>
+                    </div>
+                    <div className="text-center p-3 bg-muted/50 rounded-lg">
+                      <Shield className="h-5 w-5 mx-auto mb-1 text-rose-500" />
+                      <p className="text-sm font-medium">Washroom</p>
+                      <p className="text-xs text-muted-foreground capitalize">{room.features.washroom}</p>
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -141,31 +188,61 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
                   {/* Room Features */}
                   <div>
                     <h4 className="font-medium mb-3 text-muted-foreground">Room Features</h4>
-                    <div className="space-y-2">
-                      <div className="flex items-center">
-                        <Home className="h-4 w-4 mr-2 text-rose-500" />
-                        <span className="text-sm">{room.features.furnished ? 'Fully Furnished' : 'Unfurnished'}</span>
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <div className="flex items-center">
+                          <Home className="h-4 w-4 mr-2 text-rose-500" />
+                          <span className="text-sm">Furnished</span>
+                        </div>
+                        {room.features.furnished ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
                       </div>
-                      <div className="flex items-center">
-                        <Shield className="h-4 w-4 mr-2 text-rose-500" />
-                        <span className="text-sm capitalize">{room.features.washroom} Washroom</span>
+                      <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <div className="flex items-center">
+                          <Car className="h-4 w-4 mr-2 text-rose-500" />
+                          <span className="text-sm">Parking</span>
+                        </div>
+                        {room.features.parking ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
                       </div>
-                      {room.features.kitchen && (
+                      <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <div className="flex items-center">
+                          <Wifi className="h-4 w-4 mr-2 text-rose-500" />
+                          <span className="text-sm">WiFi</span>
+                        </div>
+                        {room.features.wifi ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
                         <div className="flex items-center">
                           <Home className="h-4 w-4 mr-2 text-rose-500" />
                           <span className="text-sm">Kitchen Access</span>
                         </div>
-                      )}
+                        {room.features.kitchen ? (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        ) : (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                      </div>
                     </div>
                   </div>
 
                   {/* Additional Amenities */}
                   <div>
                     <h4 className="font-medium mb-3 text-muted-foreground">Additional Amenities</h4>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 gap-2">
                       {room.amenities.map((amenity, index) => (
-                        <div key={index} className="flex items-center">
-                          <div className="h-2 w-2 bg-rose-500 rounded-full mr-2"></div>
+                        <div key={index} className="flex items-center p-2 bg-muted/30 rounded">
+                          <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
                           <span className="text-sm">{amenity}</span>
                         </div>
                       ))}
@@ -175,27 +252,46 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
               </CardContent>
             </Card>
 
-            {/* Preferences */}
+            {/* Tenant Preferences & Rules */}
             <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-6">
-                <h3 className="text-xl font-semibold mb-4">Tenant Preferences</h3>
+                <h3 className="text-xl font-semibold mb-4">Tenant Preferences & House Rules</h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center">
-                    <User className="h-4 w-4 mr-2 text-rose-500" />
-                    <span className="text-sm">Gender: <span className="font-medium capitalize">{room.preferences.gender}</span></span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-muted-foreground">Preferences</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">Preferred Profession</span>
+                        <Badge variant="outline">{room.preferences.profession.join(', ')}</Badge>
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">Gender Preference</span>
+                        <Badge variant="outline" className="capitalize">{room.preferences.gender}</Badge>
+                      </div>
+                    </div>
                   </div>
-                  <div className="flex items-center">
-                    <Shield className="h-4 w-4 mr-2 text-rose-500" />
-                    <span className="text-sm">Smoking: <span className="font-medium">{room.preferences.smokingAllowed ? 'Allowed' : 'Not Allowed'}</span></span>
-                  </div>
-                  <div className="flex items-center">
-                    <Home className="h-4 w-4 mr-2 text-rose-500" />
-                    <span className="text-sm">Pets: <span className="font-medium">{room.preferences.petsAllowed ? 'Allowed' : 'Not Allowed'}</span></span>
-                  </div>
-                  <div className="flex items-center">
-                    <User className="h-4 w-4 mr-2 text-rose-500" />
-                    <span className="text-sm">Profession: <span className="font-medium">{room.preferences.profession.join(', ')}</span></span>
+                  
+                  <div className="space-y-3">
+                    <h4 className="font-medium text-muted-foreground">House Rules</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">Smoking</span>
+                        {room.preferences.smokingAllowed ? (
+                          <Badge variant="default" className="bg-green-100 text-green-800">Allowed</Badge>
+                        ) : (
+                          <Badge variant="destructive">Not Allowed</Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center justify-between p-2 bg-muted/30 rounded">
+                        <span className="text-sm">Pets</span>
+                        {room.preferences.petsAllowed ? (
+                          <Badge variant="default" className="bg-green-100 text-green-800">Allowed</Badge>
+                        ) : (
+                          <Badge variant="destructive">Not Allowed</Badge>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -215,7 +311,7 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
                 <div className="space-y-4 mb-6">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Available from:</span>
-                    <span className="font-medium">{new Date(room.availability.availableFrom).toLocaleDateString()}</span>
+                    <span className="font-medium">{formatDate(room.availability.availableFrom)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Minimum stay:</span>
@@ -223,7 +319,9 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Status:</span>
-                    <span className="font-medium capitalize">{room.availability.available ? 'Available' : 'Not Available'}</span>
+                    <Badge variant={room.availability.available ? "default" : "secondary"}>
+                      {room.availability.available ? 'Available' : 'Not Available'}
+                    </Badge>
                   </div>
                 </div>
 
@@ -246,7 +344,7 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
               </CardContent>
             </Card>
 
-            {/* Owner Info */}
+            {/* Enhanced Owner Info */}
             <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
               <CardContent className="p-6">
                 <h3 className="text-lg font-semibold mb-4">Owner Information</h3>
@@ -258,6 +356,10 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
                   <div>
                     <p className="font-medium">{room.ownerName}</p>
                     <p className="text-sm text-muted-foreground">Property Owner</p>
+                    <div className="flex items-center mt-1">
+                      <div className="h-2 w-2 bg-green-500 rounded-full mr-1"></div>
+                      <span className="text-xs text-green-600">Active now</span>
+                    </div>
                   </div>
                 </div>
 
@@ -266,11 +368,21 @@ const RoomDetailPage: React.FC<RoomDetailPageProps> = ({ room, onBack }) => {
                     <Phone className="h-4 w-4 mr-2 text-muted-foreground" />
                     <span className="text-sm">{room.ownerPhone}</span>
                   </div>
+                  <div className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
+                    <span className="text-sm">Member since {new Date(room.createdAt).getFullYear()}</span>
+                  </div>
                 </div>
 
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <span>Response rate: 95%</span>
-                  <span>Usually responds within 1 hour</span>
+                <div className="grid grid-cols-2 gap-4 text-center text-sm">
+                  <div className="p-2 bg-muted/50 rounded">
+                    <p className="font-medium text-green-600">95%</p>
+                    <p className="text-xs text-muted-foreground">Response rate</p>
+                  </div>
+                  <div className="p-2 bg-muted/50 rounded">
+                    <p className="font-medium text-blue-600">1 hour</p>
+                    <p className="text-xs text-muted-foreground">Response time</p>
+                  </div>
                 </div>
               </CardContent>
             </Card>

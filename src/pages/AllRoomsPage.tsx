@@ -333,14 +333,16 @@ const AllRoomsPage: React.FC = () => {
         </div>
 
         <div className="flex gap-6">
-          {/* Filters Sidebar */}
+          {/* Sticky Filters Sidebar */}
           <div className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-80 flex-shrink-0`}>
-            <SearchFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              onClose={() => setShowFilters(false)}
-              isModal={showFilters && window.innerWidth < 768}
-            />
+            <div className="sticky top-24 max-h-[calc(100vh-120px)] overflow-y-auto">
+              <SearchFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                onClose={() => setShowFilters(false)}
+                isModal={showFilters && window.innerWidth < 768}
+              />
+            </div>
           </div>
 
           {/* Rooms Grid */}
