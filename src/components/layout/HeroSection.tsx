@@ -98,7 +98,7 @@ const HeroSection: React.FC = () => {
         </div>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes slideshow {
           0%, 20% { opacity: 1; }
           25%, 95% { opacity: 0; }

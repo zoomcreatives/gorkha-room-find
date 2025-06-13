@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Filter } from 'lucide-react';
@@ -351,7 +350,7 @@ const AllRoomsPage: React.FC = () => {
                   <ModernRoomCard
                     key={room.id}
                     room={room}
-                    onViewRoom={handleViewRoom}
+                    onView={handleViewRoom}
                     userRole="searcher"
                   />
                 ))}
