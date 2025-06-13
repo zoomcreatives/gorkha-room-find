@@ -4,7 +4,7 @@ import { Plus, Home, Clock, CheckCircle, XCircle } from 'lucide-react';
 import { DUMMY_ROOMS } from '../data/dummyRooms';
 import { Room } from '../types/room';
 import { useAuth } from '../contexts/AuthContext';
-import Header from '../components/layout/Header';
+import ModernHeader from '../components/layout/ModernHeader';
 import RoomCard from '../components/rooms/RoomCard';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -45,15 +45,15 @@ const OwnerDashboard: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header showSearch={false} />
+    <div className="min-h-screen bg-background">
+      <ModernHeader />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">My Properties</h1>
-            <p className="text-gray-600">Manage your room listings and track their status</p>
+            <h1 className="text-2xl font-bold text-foreground">My Properties</h1>
+            <p className="text-muted-foreground">Manage your room listings and track their status</p>
           </div>
           <Button onClick={handleAddRoom} className="bg-rose-500 hover:bg-rose-600">
             <Plus className="h-4 w-4 mr-2" />
@@ -161,11 +161,11 @@ const OwnerDashboard: React.FC = () => {
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <Home className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <Home className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
                       {selectedTab === 'all' ? 'No listings yet' : `No ${selectedTab} listings`}
                     </h3>
-                    <p className="text-gray-600 mb-4">
+                    <p className="text-muted-foreground mb-4">
                       {selectedTab === 'all' 
                         ? 'Start by adding your first room listing to the platform.'
                         : `You don't have any ${selectedTab} listings at the moment.`
@@ -194,19 +194,19 @@ const OwnerDashboard: React.FC = () => {
               <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
                 <Plus className="h-8 w-8 text-blue-600" />
                 <span className="font-medium">Add New Room</span>
-                <span className="text-sm text-gray-500">List a new property</span>
+                <span className="text-sm text-muted-foreground">List a new property</span>
               </Button>
               
               <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
                 <Clock className="h-8 w-8 text-yellow-600" />
                 <span className="font-medium">Review Pending</span>
-                <span className="text-sm text-gray-500">Check pending listings</span>
+                <span className="text-sm text-muted-foreground">Check pending listings</span>
               </Button>
               
               <Button variant="outline" className="h-auto p-4 flex flex-col items-center space-y-2">
                 <CheckCircle className="h-8 w-8 text-green-600" />
                 <span className="font-medium">Manage Active</span>
-                <span className="text-sm text-gray-500">Update live listings</span>
+                <span className="text-sm text-muted-foreground">Update live listings</span>
               </Button>
             </div>
           </CardContent>

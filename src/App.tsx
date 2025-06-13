@@ -10,6 +10,7 @@ import LoginForm from "./components/auth/LoginForm";
 import ModernSearcherDashboard from "./pages/ModernSearcherDashboard";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
+import AllRoomsPage from "./pages/AllRoomsPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -75,6 +76,13 @@ const AppRoutes = () => {
           <ProtectedRoute requiredRole="admin">
             <AdminDashboard />
           </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/all-rooms" 
+        element={
+          <AllRoomsPage />
         } 
       />
       

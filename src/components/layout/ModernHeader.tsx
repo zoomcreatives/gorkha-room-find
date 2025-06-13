@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Search, User, LogOut, Settings } from 'lucide-react';
+import { Search, User, LogOut, Settings, Grid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -13,9 +13,15 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { ThemeToggle } from '../theme/ThemeToggle';
 import { useAuth } from '../../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 const ModernHeader: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleShowAllRooms = () => {
+    navigate('/all-rooms');
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -27,6 +33,18 @@ const ModernHeader: React.FC = () => {
             RoomSpace
           </span>
         </div>
+
+        {/* Navigation */}
+        <nav className="hidden md:flex items-center space-x-6">
+          <Button 
+            variant="ghost" 
+            className="text-muted-foreground hover:text-foreground"
+            onClick={handleShowAllRooms}
+          >
+            <Grid className="w-4 h-4 mr-2" />
+            Browse All Rooms
+          </Button>
+        </nav>
 
         {/* Search Bar */}
         <div className="flex-1 max-w-md mx-8">
