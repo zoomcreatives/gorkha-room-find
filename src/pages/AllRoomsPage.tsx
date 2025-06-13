@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Filter } from 'lucide-react';
@@ -221,7 +222,7 @@ const AllRoomsPage: React.FC = () => {
       if (filters.minPrice && room.price < filters.minPrice) return false;
       if (filters.maxPrice && room.price > filters.maxPrice) return false;
 
-      // Location filter
+      // Location filter - only filter if location is defined and not the default value
       if (filters.location && 
           !room.location.area.toLowerCase().includes(filters.location.toLowerCase()) &&
           !room.location.city.toLowerCase().includes(filters.location.toLowerCase())) {
@@ -248,10 +249,10 @@ const AllRoomsPage: React.FC = () => {
       if (filters.wifi && !room.features.wifi) return false;
       if (filters.kitchen && !room.features.kitchen) return false;
 
-      // Washroom type filter
+      // Washroom type filter - only filter if washroom is defined
       if (filters.washroom && room.features.washroom !== filters.washroom) return false;
 
-      // Gender preference filter
+      // Gender preference filter - only filter if gender is defined
       if (filters.gender && room.preferences.gender !== 'any' && 
           room.preferences.gender !== filters.gender) return false;
 

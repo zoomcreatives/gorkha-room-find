@@ -68,12 +68,12 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       {/* Location */}
       <div className="space-y-3">
         <Label className="text-base font-semibold">Location</Label>
-        <Select value={localFilters.location || ''} onValueChange={(value) => updateFilter('location', value)}>
+        <Select value={localFilters.location || 'all-locations'} onValueChange={(value) => updateFilter('location', value === 'all-locations' ? undefined : value)}>
           <SelectTrigger>
             <SelectValue placeholder="Select city or area" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Locations</SelectItem>
+            <SelectItem value="all-locations">All Locations</SelectItem>
             {NEPAL_LOCATIONS.map(location => (
               <SelectItem key={location} value={location}>{location}</SelectItem>
             ))}
@@ -189,12 +189,12 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       {/* Washroom Type */}
       <div className="space-y-3">
         <Label className="text-base font-semibold">Washroom</Label>
-        <Select value={localFilters.washroom || ''} onValueChange={(value) => updateFilter('washroom', value)}>
+        <Select value={localFilters.washroom || 'any-washroom'} onValueChange={(value) => updateFilter('washroom', value === 'any-washroom' ? undefined : value)}>
           <SelectTrigger>
             <SelectValue placeholder="Any type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Any type</SelectItem>
+            <SelectItem value="any-washroom">Any type</SelectItem>
             <SelectItem value="attached">Attached</SelectItem>
             <SelectItem value="shared">Shared</SelectItem>
             <SelectItem value="common">Common</SelectItem>
@@ -205,12 +205,12 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({
       {/* Gender Preference */}
       <div className="space-y-3">
         <Label className="text-base font-semibold">Gender Preference</Label>
-        <Select value={localFilters.gender || ''} onValueChange={(value) => updateFilter('gender', value)}>
+        <Select value={localFilters.gender || 'any-gender'} onValueChange={(value) => updateFilter('gender', value === 'any-gender' ? undefined : value)}>
           <SelectTrigger>
             <SelectValue placeholder="Any gender" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Any gender</SelectItem>
+            <SelectItem value="any-gender">Any gender</SelectItem>
             <SelectItem value="male">Male only</SelectItem>
             <SelectItem value="female">Female only</SelectItem>
             <SelectItem value="any">No preference</SelectItem>
