@@ -68,6 +68,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthenticated: true,
         isLoading: false,
       });
+      // Redirect to home page after login
+      window.location.href = '/';
       return true;
     } else {
       setAuthState({
@@ -86,6 +88,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       isAuthenticated: false,
       isLoading: false,
     });
+    // Redirect to home page after logout
+    window.location.href = '/';
   };
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Filter } from 'lucide-react';
@@ -9,6 +8,7 @@ import SearchFilters from '../components/search/SearchFilters';
 import { Room, SearchFilters as SearchFiltersType } from '../types/room';
 import { Button } from '../components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 // Mock data fetch function
 const fetchAllRooms = async (): Promise<Room[]> => {
@@ -198,6 +198,7 @@ const AllRoomsPage: React.FC = () => {
   const [filters, setFilters] = useState<SearchFiltersType>({});
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const { data: rooms = [], isLoading, error } = useQuery({
     queryKey: ['allRooms'],
@@ -213,7 +214,11 @@ const AllRoomsPage: React.FC = () => {
   };
 
   const handleBackToDashboard = () => {
-    navigate(-1);
+    if (isAuthenticated) {
+      navigate(-1);
+    } else {
+      navigate('/');
+    }
   };
 
   const filterRooms = (rooms: Room[], filters: SearchFiltersType): Room[] => {
@@ -306,14 +311,17 @@ const AllRoomsPage: React.FC = () => {
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
-            <Button 
-              variant="ghost" 
-              onClick={handleBackToDashboard}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
-            </Button>
+            {/* Only show back button if user is authenticated and came from another page */}
+            {isAuthenticated && window.history.length > 1 && (
+              <Button 
+                variant="ghost" 
+                onClick={handleBackToDashboard}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Back
+              </Button>
+            )}
             <div>
               <h1 className="text-2xl font-bold text-foreground">All Rooms</h1>
               <p className="text-muted-foreground">

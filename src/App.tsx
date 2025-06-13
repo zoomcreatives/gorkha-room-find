@@ -30,27 +30,13 @@ const AppRoutes = () => {
     );
   }
 
-  if (!isAuthenticated) {
-    return <LoginForm />;
-  }
-
-  // Redirect to appropriate dashboard based on user role
-  const getDashboardRoute = () => {
-    switch (user?.role) {
-      case 'searcher':
-        return '/searcher';
-      case 'owner':
-        return '/owner';
-      case 'admin':
-        return '/admin';
-      default:
-        return '/searcher';
-    }
-  };
-
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={getDashboardRoute()} replace />} />
+      {/* Home page shows all rooms without login requirement */}
+      <Route path="/" element={<AllRoomsPage />} />
+      
+      {/* Login page */}
+      <Route path="/login" element={<LoginForm />} />
       
       <Route 
         path="/searcher" 
