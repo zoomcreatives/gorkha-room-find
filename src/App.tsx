@@ -7,10 +7,12 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { ThemeProvider } from "./components/theme/ThemeProvider";
 import LoginForm from "./components/auth/LoginForm";
+import HomePage from "./pages/HomePage";
 import ModernSearcherDashboard from "./pages/ModernSearcherDashboard";
 import OwnerDashboard from "./pages/OwnerDashboard";
 import AdminDashboard from "./pages/AdminDashboard";
 import AllRoomsPage from "./pages/AllRoomsPage";
+import RoomDetailedPage from "./pages/RoomDetailedPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotFound from "./pages/NotFound";
 
@@ -32,8 +34,8 @@ const AppRoutes = () => {
 
   return (
     <Routes>
-      {/* Home page shows all rooms without login requirement */}
-      <Route path="/" element={<AllRoomsPage />} />
+      {/* Home page shows hero section and featured rooms */}
+      <Route path="/" element={<HomePage />} />
       
       {/* Login page */}
       <Route path="/login" element={<LoginForm />} />
@@ -65,11 +67,16 @@ const AppRoutes = () => {
         } 
       />
 
+      {/* All rooms page with filters */}
       <Route 
         path="/all-rooms" 
-        element={
-          <AllRoomsPage />
-        } 
+        element={<AllRoomsPage />} 
+      />
+
+      {/* Individual room detail page */}
+      <Route 
+        path="/room-detailed/:roomId" 
+        element={<RoomDetailedPage />} 
       />
       
       <Route path="*" element={<NotFound />} />

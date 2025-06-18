@@ -1,13 +1,14 @@
+
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
 import ModernHeader from '../components/layout/ModernHeader';
 import HeroSection from '../components/layout/HeroSection';
 import FeaturedRooms from '../components/rooms/FeaturedRooms';
+import { useQuery } from '@tanstack/react-query';
 import { Room } from '../types/room';
 import { useNavigate } from 'react-router-dom';
 
-// Mock data fetch function
-const fetchRooms = async (): Promise<Room[]> => {
+// Mock data fetch function for featured rooms (showing only 3)
+const fetchFeaturedRooms = async (): Promise<Room[]> => {
   // Simulated API call
   await new Promise(resolve => setTimeout(resolve, 1000));
   
@@ -146,12 +147,12 @@ const fetchRooms = async (): Promise<Room[]> => {
   ];
 };
 
-const ModernSearcherDashboard: React.FC = () => {
+const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   const { data: rooms = [], isLoading, error } = useQuery({
-    queryKey: ['rooms'],
-    queryFn: fetchRooms,
+    queryKey: ['featuredRooms'],
+    queryFn: fetchFeaturedRooms,
   });
 
   const handleViewRoom = (room: Room) => {
@@ -193,4 +194,4 @@ const ModernSearcherDashboard: React.FC = () => {
   );
 };
 
-export default ModernSearcherDashboard;
+export default HomePage;

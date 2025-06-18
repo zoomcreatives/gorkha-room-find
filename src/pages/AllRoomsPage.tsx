@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, Filter } from 'lucide-react';
 import ModernHeader from '../components/layout/ModernHeader';
-import RoomDetailPage from '../components/rooms/RoomDetailPage';
 import ModernRoomCard from '../components/rooms/ModernRoomCard';
 import SearchFilters from '../components/search/SearchFilters';
 import { Room, SearchFilters as SearchFiltersType } from '../types/room';
@@ -194,7 +193,6 @@ const fetchAllRooms = async (): Promise<Room[]> => {
 };
 
 const AllRoomsPage: React.FC = () => {
-  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
   const [filters, setFilters] = useState<SearchFiltersType>({});
   const [showFilters, setShowFilters] = useState(false);
   const navigate = useNavigate();
@@ -206,11 +204,7 @@ const AllRoomsPage: React.FC = () => {
   });
 
   const handleViewRoom = (room: Room) => {
-    setSelectedRoom(room);
-  };
-
-  const handleBackToList = () => {
-    setSelectedRoom(null);
+    navigate(`/room-detailed/${room.id}`);
   };
 
   const handleBackToDashboard = () => {
@@ -276,10 +270,6 @@ const AllRoomsPage: React.FC = () => {
   };
 
   const filteredRooms = filterRooms(rooms, filters);
-
-  if (selectedRoom) {
-    return <RoomDetailPage room={selectedRoom} onBack={handleBackToList} />;
-  }
 
   if (isLoading) {
     return (
