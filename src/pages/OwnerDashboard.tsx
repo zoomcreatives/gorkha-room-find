@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Plus, Home, Clock, CheckCircle, XCircle, Eye, Edit, TrendingUp, Users, MapPin } from 'lucide-react';
+import { Plus, Home, Clock, CheckCircle, XCircle, Eye, Edit, TrendingUp, Users, MapPin, Settings, HelpCircle, LogOut, Bell, Search } from 'lucide-react';
 import { DUMMY_ROOMS } from '../data/dummyRooms';
 import { Room } from '../types/room';
 import { useAuth } from '../contexts/AuthContext';
@@ -10,11 +10,10 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
-import { SidebarProvider, SidebarInset, SidebarTrigger } from '../components/ui/sidebar';
-import DashboardSidebar from '../components/layout/DashboardSidebar';
+import { Avatar, AvatarFallback, AvatarImage } from '../components/ui/avatar';
 
 const OwnerDashboard: React.FC = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [selectedTab, setSelectedTab] = useState('all');
   const [showAddRoomForm, setShowAddRoomForm] = useState(false);
   const [rooms, setRooms] = useState(DUMMY_ROOMS.filter(room => room.ownerId === user?.id));
@@ -104,27 +103,45 @@ const OwnerDashboard: React.FC = () => {
     setShowAddRoomForm(false);
   };
 
+  const navigationItems = [
+    { id: 'all', label: 'All Properties', icon: Home, count: roomStats.total, color: 'blue' },
+    { id: 'approved', label: 'Active', icon: Eye, count: roomStats.approved, color: 'green' },
+    { id: 'pending', label: 'Pending', icon: Clock, count: roomStats.pending, color: 'amber' },
+    { id: 'rejected', label: 'Rejected', icon: XCircle, count: roomStats.rejected, color: 'red' },
+    { id: 'analytics', label: 'Analytics', icon: TrendingUp, count: null, color: 'purple' },
+  ];
+
   return (
-    <SidebarProvider>
-      <div className="min-h-screen flex w-full bg-gradient-to-br from-rose-50 via-white to-orange-50">
-        <DashboardSidebar userRole="owner" stats={roomStats} />
-        
-        <SidebarInset className="flex-1">
-          {/* Header */}
-          <header className="flex h-16 shrink-0 items-center gap-2 px-4 border-b bg-white/80 backdrop-blur-sm">
-            <SidebarTrigger className="-ml-1" />
-            <div className="flex items-center justify-between w-full">
-              <div className="flex items-center space-x-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-rose-500 to-pink-600 rounded-lg flex items-center justify-center">
-                  <Home className="h-4 w-4 text-white" />
-                </div>
-                <div>
-                  <h1 className="text-xl font-bold text-gray-900">
-                    Welcome back, {user?.name}! 👋
-                  </h1>
-                  <p className="text-sm text-gray-600">Manage your property listings</p>
-                </div>
+    <div className="min-h-screen bg-gradient-to-br from-rose-50 via-white to-orange-100">
+      {/* Modern Top Navigation */}
+      <nav className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            {/* Left: Logo & Title */}
+            <div className="flex items-center space-x-4">
+              <div className="w-10 h-10 bg-gradient-to-br from-rose-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg">
+                <Home className="h-5 w-5 text-white" />
               </div>
+              <div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-rose-500 to-pink-600 bg-clip-text text-transparent">
+                  Welcome back, {user?.name}! 👋
+                </h1>
+                <p className="text-xs text-gray-500">Property Management Dashboard</p>
+              </div>
+            </div>
+
+            {/* Center: Search */}
+            <div className="hidden md:flex items-center space-x-2 bg-gray-100/50 rounded-2xl px-4 py-2 min-w-96">
+              <Search className="h-4 w-4 text-gray-400" />
+              <input 
+                type="text" 
+                placeholder="Search your properties..." 
+                className="bg-transparent border-none outline-none text-sm flex-1"
+              />
+            </div>
+
+            {/* Right: Actions & Profile */}
+            <div className="flex items-center space-x-4">
               <Button 
                 onClick={handleAddRoom} 
                 className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-lg transition-all duration-200 transform hover:scale-105"
@@ -133,221 +150,291 @@ const OwnerDashboard: React.FC = () => {
                 <Plus className="h-4 w-4 mr-2" />
                 Add Property
               </Button>
+
+              <Button variant="ghost" size="sm" className="relative">
+                <Bell className="h-4 w-4" />
+                {roomStats.pending > 0 && (
+                  <Badge className="absolute -top-1 -right-1 h-5 w-5 p-0 bg-amber-500 text-white text-xs flex items-center justify-center">
+                    {roomStats.pending}
+                  </Badge>
+                )}
+              </Button>
+              
+              <Button variant="ghost" size="sm">
+                <Settings className="h-4 w-4" />
+              </Button>
+
+              <div className="flex items-center space-x-3">
+                <Avatar className="w-8 h-8 ring-2 ring-rose-200">
+                  <AvatarImage src={user?.avatar} alt={user?.name} />
+                  <AvatarFallback className="bg-gradient-to-br from-rose-500 to-pink-600 text-white text-xs font-bold">
+                    {user?.name?.split(' ').map(n => n[0]).join('').toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={logout}
+                  className="text-gray-600 hover:text-red-600"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
-          </header>
+          </div>
+        </div>
+      </nav>
 
-          <main className="flex-1 p-6 space-y-6">
-            {/* Stats Overview */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-blue-100">Total Properties</CardTitle>
-                  <Home className="h-5 w-5 text-blue-100" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{roomStats.total}</div>
-                  <p className="text-xs text-blue-100 mt-1">All your listings</p>
-                </CardContent>
-              </Card>
+      {/* Navigation Tabs */}
+      <div className="bg-white/60 backdrop-blur-sm border-b border-gray-200/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-1 py-3 overflow-x-auto">
+            {navigationItems.map((item) => (
+              <Button
+                key={item.id}
+                variant={selectedTab === item.id ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setSelectedTab(item.id)}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-xl transition-all duration-200 whitespace-nowrap ${
+                  selectedTab === item.id 
+                    ? `bg-gradient-to-r ${
+                        item.color === 'amber' ? 'from-amber-500 to-orange-500' :
+                        item.color === 'green' ? 'from-green-500 to-emerald-500' :
+                        item.color === 'red' ? 'from-red-500 to-rose-500' :
+                        item.color === 'blue' ? 'from-blue-500 to-cyan-500' :
+                        'from-purple-500 to-violet-500'
+                      } text-white shadow-lg hover:shadow-xl transform hover:scale-105`
+                    : 'hover:bg-gray-100/80'
+                }`}
+              >
+                <item.icon className="h-4 w-4" />
+                <span className="font-medium">{item.label}</span>
+                {item.count !== null && item.count > 0 && (
+                  <Badge 
+                    variant="secondary" 
+                    className={`${selectedTab === item.id ? 'bg-white/20 text-white' : 'bg-gray-200 text-gray-700'} text-xs px-2 py-0.5`}
+                  >
+                    {item.count}
+                  </Badge>
+                )}
+              </Button>
+            ))}
+          </div>
+        </div>
+      </div>
 
-              <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-green-100">Active Listings</CardTitle>
-                  <CheckCircle className="h-5 w-5 text-green-100" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{roomStats.approved}</div>
-                  <p className="text-xs text-green-100 mt-1">Live on platform</p>
-                </CardContent>
-              </Card>
+      {/* Main Content */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Stats Overview */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <Card className="bg-gradient-to-br from-blue-500 to-blue-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-blue-100">Total Properties</CardTitle>
+              <Home className="h-5 w-5 text-blue-100" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{roomStats.total}</div>
+              <p className="text-xs text-blue-100 mt-1">All your listings</p>
+            </CardContent>
+          </Card>
 
-              <Card className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white border-0 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-yellow-100">Pending Review</CardTitle>
-                  <Clock className="h-5 w-5 text-yellow-100" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">{roomStats.pending}</div>
-                  <p className="text-xs text-yellow-100 mt-1">Under review</p>
-                </CardContent>
-              </Card>
+          <Card className="bg-gradient-to-br from-green-500 to-green-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-green-100">Active Listings</CardTitle>
+              <CheckCircle className="h-5 w-5 text-green-100" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{roomStats.approved}</div>
+              <p className="text-xs text-green-100 mt-1">Live on platform</p>
+            </CardContent>
+          </Card>
 
-              <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-lg">
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium text-purple-100">Avg. Price</CardTitle>
-                  <TrendingUp className="h-5 w-5 text-purple-100" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-3xl font-bold">₹{avgPrice.toLocaleString()}</div>
-                  <p className="text-xs text-purple-100 mt-1">Per month</p>
-                </CardContent>
-              </Card>
-            </div>
+          <Card className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-yellow-100">Pending Review</CardTitle>
+              <Clock className="h-5 w-5 text-yellow-100" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">{roomStats.pending}</div>
+              <p className="text-xs text-yellow-100 mt-1">Under review</p>
+            </CardContent>
+          </Card>
 
-            {/* Performance Metrics */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <Card className="lg:col-span-2 shadow-lg border-0">
-                <CardHeader>
-                  <CardTitle className="text-xl text-gray-800">Property Performance</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-green-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                        <span className="font-medium text-green-900">Active Listings</span>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-green-700">{roomStats.approved}</div>
-                        <div className="text-sm text-green-600">₹{totalRevenue.toLocaleString()}/mo total</div>
-                      </div>
+          <Card className="bg-gradient-to-br from-purple-500 to-purple-600 text-white border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-purple-100">Avg. Price</CardTitle>
+              <TrendingUp className="h-5 w-5 text-purple-100" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold">₹{avgPrice.toLocaleString()}</div>
+              <p className="text-xs text-purple-100 mt-1">Per month</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Performance Metrics */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <Card className="lg:col-span-2 shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-xl text-gray-800">Property Performance</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-4 bg-green-50 rounded-xl">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                    <span className="font-medium text-green-900">Active Listings</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-green-700">{roomStats.approved}</div>
+                    <div className="text-sm text-green-600">₹{totalRevenue.toLocaleString()}/mo total</div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-xl">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                    <span className="font-medium text-yellow-900">Pending Approval</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-yellow-700">{roomStats.pending}</div>
+                    <div className="text-sm text-yellow-600">Awaiting review</div>
+                  </div>
+                </div>
+
+                {roomStats.rejected > 0 && (
+                  <div className="flex items-center justify-between p-4 bg-red-50 rounded-xl">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                      <span className="font-medium text-red-900">Need Attention</span>
                     </div>
-
-                    <div className="flex items-center justify-between p-4 bg-yellow-50 rounded-lg">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-                        <span className="font-medium text-yellow-900">Pending Approval</span>
-                      </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-yellow-700">{roomStats.pending}</div>
-                        <div className="text-sm text-yellow-600">Awaiting review</div>
-                      </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-red-700">{roomStats.rejected}</div>
+                      <div className="text-sm text-red-600">Require updates</div>
                     </div>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
 
-                    {roomStats.rejected > 0 && (
-                      <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
-                        <div className="flex items-center space-x-3">
-                          <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                          <span className="font-medium text-red-900">Need Attention</span>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-red-700">{roomStats.rejected}</div>
-                          <div className="text-sm text-red-600">Require updates</div>
-                        </div>
-                      </div>
+          <Card className="shadow-xl border-0 bg-white/80 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-xl text-gray-800">Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button 
+                onClick={handleAddRoom}
+                className="w-full justify-start bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-lg transform hover:scale-105 transition-all"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Property
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="w-full justify-start border-yellow-300 text-yellow-700 hover:bg-yellow-50 transform hover:scale-105 transition-all"
+                onClick={() => setSelectedTab('pending')}
+              >
+                <Clock className="h-4 w-4 mr-2" />
+                Review Pending ({roomStats.pending})
+              </Button>
+              
+              <Button 
+                variant="outline" 
+                className="w-full justify-start border-green-300 text-green-700 hover:bg-green-50 transform hover:scale-105 transition-all"
+                onClick={() => setSelectedTab('approved')}
+              >
+                <Eye className="h-4 w-4 mr-2" />
+                View Active Listings
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Property Listings */}
+        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 rounded-t-lg">
+            <CardTitle className="text-xl text-gray-800">Your Properties</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <Tabs value={selectedTab} onValueChange={setSelectedTab}>
+              <TabsList className="grid w-full grid-cols-4 mb-6 bg-gray-100/50 rounded-2xl p-1">
+                <TabsTrigger value="all" className="text-sm rounded-xl">
+                  All ({roomStats.total})
+                </TabsTrigger>
+                <TabsTrigger value="approved" className="text-sm rounded-xl">
+                  <span className="flex items-center space-x-1">
+                    <span>Active</span>
+                    <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
+                      {roomStats.approved}
+                    </Badge>
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value="pending" className="text-sm rounded-xl">
+                  <span className="flex items-center space-x-1">
+                    <span>Pending</span>
+                    <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">
+                      {roomStats.pending}
+                    </Badge>
+                  </span>
+                </TabsTrigger>
+                <TabsTrigger value="rejected" className="text-sm rounded-xl">
+                  <span className="flex items-center space-x-1">
+                    <span>Rejected</span>
+                    <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs">
+                      {roomStats.rejected}
+                    </Badge>
+                  </span>
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value={selectedTab}>
+                {filteredRooms.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {filteredRooms.map(room => (
+                      <RoomCard
+                        key={room.id}
+                        room={room}
+                        showStatus={true}
+                        onView={handleViewRoom}
+                        onEdit={handleEditRoom}
+                        userRole="owner"
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-16">
+                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Home className="h-12 w-12 text-gray-400" />
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      {selectedTab === 'all' ? 'No properties yet' : `No ${selectedTab} properties`}
+                    </h3>
+                    <p className="text-gray-600 mb-6 max-w-md mx-auto">
+                      {selectedTab === 'all' 
+                        ? 'Start building your property portfolio by listing your first room.'
+                        : `You don't have any ${selectedTab} properties at the moment.`
+                      }
+                    </p>
+                    {selectedTab === 'all' && (
+                      <Button 
+                        onClick={handleAddRoom} 
+                        className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white shadow-lg transform hover:scale-105 transition-all"
+                        size="lg"
+                      >
+                        <Plus className="h-5 w-5 mr-2" />
+                        List Your First Property
+                      </Button>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg border-0">
-                <CardHeader>
-                  <CardTitle className="text-xl text-gray-800">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  <Button 
-                    onClick={handleAddRoom}
-                    className="w-full justify-start bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white"
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add New Property
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start border-yellow-300 text-yellow-700 hover:bg-yellow-50"
-                    onClick={() => setSelectedTab('pending')}
-                  >
-                    <Clock className="h-4 w-4 mr-2" />
-                    Review Pending ({roomStats.pending})
-                  </Button>
-                  
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-start border-green-300 text-green-700 hover:bg-green-50"
-                    onClick={() => setSelectedTab('approved')}
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    View Active Listings
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Property Listings */}
-            <Card className="shadow-xl border-0">
-              <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
-                <CardTitle className="text-xl text-gray-800">Your Properties</CardTitle>
-              </CardHeader>
-              <CardContent className="p-6">
-                <Tabs value={selectedTab} onValueChange={setSelectedTab}>
-                  <TabsList className="grid w-full grid-cols-4 mb-6">
-                    <TabsTrigger value="all" className="text-sm">
-                      All ({roomStats.total})
-                    </TabsTrigger>
-                    <TabsTrigger value="approved" className="text-sm">
-                      <span className="flex items-center space-x-1">
-                        <span>Active</span>
-                        <Badge variant="secondary" className="bg-green-100 text-green-800 text-xs">
-                          {roomStats.approved}
-                        </Badge>
-                      </span>
-                    </TabsTrigger>
-                    <TabsTrigger value="pending" className="text-sm">
-                      <span className="flex items-center space-x-1">
-                        <span>Pending</span>
-                        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 text-xs">
-                          {roomStats.pending}
-                        </Badge>
-                      </span>
-                    </TabsTrigger>
-                    <TabsTrigger value="rejected" className="text-sm">
-                      <span className="flex items-center space-x-1">
-                        <span>Rejected</span>
-                        <Badge variant="secondary" className="bg-red-100 text-red-800 text-xs">
-                          {roomStats.rejected}
-                        </Badge>
-                      </span>
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value={selectedTab}>
-                    {filteredRooms.length > 0 ? (
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {filteredRooms.map(room => (
-                          <RoomCard
-                            key={room.id}
-                            room={room}
-                            showStatus={true}
-                            onView={handleViewRoom}
-                            onEdit={handleEditRoom}
-                            userRole="owner"
-                          />
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-16">
-                        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <Home className="h-12 w-12 text-gray-400" />
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          {selectedTab === 'all' ? 'No properties yet' : `No ${selectedTab} properties`}
-                        </h3>
-                        <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                          {selectedTab === 'all' 
-                            ? 'Start building your property portfolio by listing your first room.'
-                            : `You don't have any ${selectedTab} properties at the moment.`
-                          }
-                        </p>
-                        {selectedTab === 'all' && (
-                          <Button 
-                            onClick={handleAddRoom} 
-                            className="bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white"
-                            size="lg"
-                          >
-                            <Plus className="h-5 w-5 mr-2" />
-                            List Your First Property
-                          </Button>
-                        )}
-                      </div>
-                    )}
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-            </Card>
-          </main>
-        </SidebarInset>
-      </div>
+                )}
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
+      </main>
 
       {/* Add Room Form Modal */}
       {showAddRoomForm && (
@@ -356,7 +443,7 @@ const OwnerDashboard: React.FC = () => {
           onSubmit={handleAddRoomSubmit}
         />
       )}
-    </SidebarProvider>
+    </div>
   );
 };
 
