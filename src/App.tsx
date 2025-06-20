@@ -40,6 +40,7 @@ const AppRoutes = () => {
       {/* Login page */}
       <Route path="/login" element={<LoginForm />} />
       
+      {/* Searcher Dashboard Routes */}
       <Route 
         path="/searcher" 
         element={
@@ -50,6 +51,16 @@ const AppRoutes = () => {
       />
       
       <Route 
+        path="/searcher-dashboard" 
+        element={
+          <ProtectedRoute requiredRole="searcher">
+            <ModernSearcherDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Owner Dashboard Routes */}
+      <Route 
         path="/owner" 
         element={
           <ProtectedRoute requiredRole="owner">
@@ -59,6 +70,25 @@ const AppRoutes = () => {
       />
       
       <Route 
+        path="/owner-dashboard" 
+        element={
+          <ProtectedRoute requiredRole="owner">
+            <OwnerDashboard />
+          </ProtectedRoute>
+        } 
+      />
+
+      <Route 
+        path="/owner-dashboard/analytics" 
+        element={
+          <ProtectedRoute requiredRole="owner">
+            <OwnerDashboard />
+          </ProtectedRoute>
+        } 
+      />
+      
+      {/* Admin Dashboard Routes */}
+      <Route 
         path="/admin" 
         element={
           <ProtectedRoute requiredRole="admin">
@@ -66,18 +96,39 @@ const AppRoutes = () => {
           </ProtectedRoute>
         } 
       />
-
-      {/* All rooms page with filters */}
+      
       <Route 
-        path="/all-rooms" 
-        element={<AllRoomsPage />} 
+        path="/admin-dashboard" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        } 
       />
 
-      {/* Individual room detail page */}
       <Route 
-        path="/room-detailed/:roomId" 
-        element={<RoomDetailedPage />} 
+        path="/admin-dashboard/users" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        } 
       />
+
+      <Route 
+        path="/admin-dashboard/analytics" 
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        } 
+      />
+
+      {/* Public Routes */}
+      <Route path="/all-rooms" element={<AllRoomsPage />} />
+      <Route path="/room-detailed/:roomId" element={<RoomDetailedPage />} />
+      <Route path="/settings" element={<div className="p-8"><h1 className="text-2xl">Settings Page</h1></div>} />
+      <Route path="/help" element={<div className="p-8"><h1 className="text-2xl">Help & Support</h1></div>} />
       
       <Route path="*" element={<NotFound />} />
     </Routes>
